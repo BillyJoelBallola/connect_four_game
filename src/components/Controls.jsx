@@ -1,18 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
-const Controls = ({ setCircles }) => {
-  const restart = () => {
-    setCircles([
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-    ]);
-  };
-
+const Controls = ({ restart }) => {
   return (
     <div className="flex items-center justify-between mx-auto w-[90%] md:w-[500px]">
       <NavLink
