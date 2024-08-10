@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
-const Controls = ({ restart }) => {
+const Controls = ({ openConfirmRestart }) => {
   return (
     <div className="flex items-center justify-between mx-auto w-[90%] md:w-[500px]">
       <NavLink
@@ -12,7 +12,7 @@ const Controls = ({ restart }) => {
       </NavLink>
       <img src="/logo.png" alt="logo" className="w-12" />
       <button
-        onClick={restart}
+        onClick={openConfirmRestart}
         className="bg-violet-900 hover:bg-violet-800 duration-200 py-1 px-4 rounded-full"
       >
         RESTART

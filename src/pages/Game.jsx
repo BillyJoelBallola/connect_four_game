@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Controls from "../components/Controls";
 import MobileScoreBoard from "../components/MobileScoreBoard";
-import TimerBoard from "../components/TimerBoard";
+import StatusBoard from "../components/StatusBoard";
 import GameBoard from "../components/GameBoard";
 import CustomModal from "../components/CustomModal";
-
-// before entering the game, players will choice who's going to attack first and make in play again also
 
 // TODO:
 // [/] winner
@@ -19,8 +17,10 @@ const Game = () => {
     playerOne: 0,
     playerTwo: 0,
   });
-  const [attacker, setAttacker] = useState(1);
+  const [attacker, setAttacker] = useState(0);
   const [isVictor, setIsVictor] = useState(false);
+  const [confirmRestart, setConfirmRestart] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(false);
   const [isDraw, setIsDraw] = useState(false);
   const [timer, setTimer] = useState(30);
   const [circles, setCircles] = useState([
@@ -32,7 +32,7 @@ const Game = () => {
     [0, 0, 0, 0, 0, 0, 0],
   ]);
 
-  const restart = () => {
+  const resetBoard = () => {
     setCircles([
       [0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0],
@@ -41,6 +41,14 @@ const Game = () => {
       [0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0],
     ]);
+  };
+
+  const restart = () => {
+    setScores({ playerOne: 0, playerTwo: 0 });
+    setFirstLoad(true);
+    setConfirmRestart(false);
+    setAttacker(0);
+    resetBoard();
   };
 
   const switchAttacker = () => {
@@ -156,13 +164,15 @@ const Game = () => {
   };
 
   const playAgain = () => {
-    restart();
+    resetBoard();
     setIsVictor(false);
     setIsDraw(false);
-    setTimer(30);
+    switchAttacker();
   };
 
   useEffect(() => {
+    if (attacker === 0 || isVictor || isDraw) return;
+
     const intervalId = setInterval(() => {
       if (timer > 0) {
         setTimer((current) => current - 1);
@@ -175,49 +185,93 @@ const Game = () => {
     return () => clearInterval(intervalId);
   }, [timer, attacker]);
 
+  useEffect(() => {
+    setFirstLoad(() => attacker === 0);
+  }, [attacker]);
+
   return (
-    <div className="flex flex-col gap-8 relative h-full pt-10 pb-28">
-      {/* <CustomModal>
-        <div className="text-black flex flex-col text-center">
-          <span>PLAYER {attacker}</span>
-          <span>WINS</span>
-        </div>
-      </CustomModal> */}
-      <Controls restart={restart} />
-      <MobileScoreBoard scores={scores} />
-      <div className="flex items-center justify-around relative">
-        <div className="relative p-4 pt-6 sm-border hidden md:flex flex-col items-center font-semibold bg-white text-black">
-          <img
-            src="/yellow-emoji.png"
-            alt="emoji"
-            className="w-10 absolute -top-6"
+    <>
+      {confirmRestart && (
+        <CustomModal>
+          <div className="text-black font-semibold flex flex-col gap-4 items-center">
+            <span>Are you sure you want to restart the game?</span>
+            <div className="flex gap-4">
+              <button
+                onClick={restart}
+                className="bg-amber-500 hover:bg-amber-400 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
+              >
+                YES
+              </button>
+              <button
+                onClick={() => setConfirmRestart(false)}
+                className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
+              >
+                NO
+              </button>
+            </div>
+          </div>
+        </CustomModal>
+      )}
+      {firstLoad && (
+        <CustomModal>
+          <div className="text-black font-semibold flex flex-col gap-4 items-center">
+            <span>Choose who's first player</span>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setAttacker(1)}
+                className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border p-4"
+              >
+                <img src="/yellow-emoji-front.png" alt="yellow emoji" />
+                <span>PLAYER 1</span>
+              </button>
+              <button
+                onClick={() => setAttacker(2)}
+                className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border p-4"
+              >
+                <img src="/pink-emoji-front.png" alt="pink emoji" />
+                <span>PLAYER 2</span>
+              </button>
+            </div>
+          </div>
+        </CustomModal>
+      )}
+      <div className="flex flex-col gap-8 h-full pt-10 pb-28">
+        <Controls openConfirmRestart={() => setConfirmRestart(true)} />
+        <MobileScoreBoard scores={scores} />
+        <div className="flex items-center justify-around relative">
+          <div className="relative p-4 pt-6 sm-border hidden md:flex flex-col items-center font-semibold bg-white text-black">
+            <img
+              src="/yellow-emoji.png"
+              alt="emoji"
+              className="w-10 absolute -top-6"
+            />
+            <span>PLAYER 1</span>
+            <span className="text-[3.5rem] -m-4">{scores.playerOne}</span>
+          </div>
+          <GameBoard
+            circles={circles}
+            isVictor={isVictor}
+            placeAttack={placeAttack}
           />
-          <span>PLAYER 1</span>
-          <span className="text-[3.5rem] -m-4">{scores.playerOne}</span>
-        </div>
-        <GameBoard
-          circles={circles}
-          isVictor={isVictor}
-          placeAttack={placeAttack}
-        />
-        <div className="relative p-4 pt-6 sm-border hidden md:flex flex-col items-center font-semibold bg-white text-black">
-          <img
-            src="/pink-emoji.png"
-            alt="emoji"
-            className="w-10 absolute -top-6"
+          <div className="relative p-4 pt-6 sm-border hidden md:flex flex-col items-center font-semibold bg-white text-black">
+            <img
+              src="/pink-emoji.png"
+              alt="emoji"
+              className="w-10 absolute -top-6"
+            />
+            <span>PLAYER 2</span>
+            <span className="text-[3.5rem] -m-4">{scores.playerTwo}</span>
+          </div>
+          <StatusBoard
+            attacker={attacker}
+            timer={timer}
+            isVictor={isVictor}
+            isDraw={isDraw}
+            playAgain={playAgain}
           />
-          <span>PLAYER 2</span>
-          <span className="text-[3.5rem] -m-4">{scores.playerTwo}</span>
         </div>
-        <TimerBoard
-          attacker={attacker}
-          timer={timer}
-          isVictor={isVictor}
-          isDraw={isDraw}
-          playAgain={playAgain}
-        />
       </div>
-    </div>
+    </>
   );
 };
 

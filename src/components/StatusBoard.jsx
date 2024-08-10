@@ -1,9 +1,14 @@
 import React from "react";
 
-const TimerBoard = ({ attacker, timer, isVictor, playAgain, isDraw }) => {
-  return isVictor || isDraw ? (
+const StatusBoard = ({ attacker, timer, isVictor, playAgain, isDraw }) => {
+  return attacker === 0 ? (
+    <div className="bg-white text-black sm-border font-semibold flex flex-col items-center py-4 px-10 absolute -bottom-20">
+      <span>CHOOSE A</span>
+      <span className="text-[3.5rem] -m-4">PLAYER</span>
+    </div>
+  ) : isVictor || isDraw ? (
     <div className="bg-white text-black sm-border font-semibold flex flex-col items-center py-4 px-10 absolute -bottom-28">
-      <span>{isDraw ? "It's a" : `PLAYER ${attacker}`}</span>
+      <span>{isDraw ? "It's a" : `PLAYER ${attacker === 1 ? 2 : 1}`}</span>
       <span className="text-[3.5rem] -m-4">{isDraw ? "DRAW" : "WINS"}</span>
       <button
         onClick={playAgain}
@@ -18,10 +23,10 @@ const TimerBoard = ({ attacker, timer, isVictor, playAgain, isDraw }) => {
         attacker === 1 ? "bg-amber-500" : "bg-rose-400"
       } sm-border font-semibold flex flex-col items-center p-4 absolute -bottom-20`}
     >
-      <span>PLAYER 1'S TURN</span>
+      <span>PLAYER {attacker}'S TURN</span>
       <span className="text-[3.5rem] -m-4">{timer}s</span>
     </div>
   );
 };
 
-export default TimerBoard;
+export default StatusBoard;
