@@ -246,7 +246,7 @@ const Game = () => {
     <>
       {isLeavingGame && (
         <CustomModal>
-          <div className="text-black font-semibold flex flex-col gap-4 items-center">
+          <div className="text-black text-center font-semibold flex flex-col gap-4 items-center">
             <span>Are you sure you want to leave the game?</span>
             <div className="flex gap-4">
               <NavLink
@@ -267,7 +267,7 @@ const Game = () => {
       )}
       {confirmRestart && (
         <CustomModal>
-          <div className="text-black font-semibold flex flex-col gap-4 items-center">
+          <div className="text-black text-center font-semibold flex flex-col gap-4 items-center">
             <span>Are you sure you want to restart the game?</span>
             <div className="flex gap-4">
               <button
@@ -288,7 +288,7 @@ const Game = () => {
       )}
       {firstLoad && (
         <CustomModal>
-          <div className="text-black font-semibold flex flex-col gap-4 items-center">
+          <div className="text-black text-center font-semibold flex flex-col gap-4 items-center">
             <span>Choose the first player</span>
             <div className="flex gap-4">
               <button
