@@ -9,6 +9,7 @@ import CustomModal from "../components/CustomModal";
 // [/] winner
 // [/] scoring
 // [/] play again
+// [x] diagonal checking
 // [x] pause?
 // [x] settings?
 
@@ -58,7 +59,7 @@ const Game = () => {
   const isWinner = (arr, rowIdx, colIdx) => {
     const row = arr[rowIdx];
 
-    const checkX = (startCol, direction) => {
+    const checkHorizontal = (startCol, direction) => {
       let count = 0;
 
       for (let col = startCol; col >= 0 && col < row.length; col += direction) {
@@ -75,7 +76,7 @@ const Game = () => {
       return false;
     };
 
-    const checkY = (startRow, col) => {
+    const checkTop = (startRow, col) => {
       let count = 0;
 
       for (let row = startRow; row >= 0 && row < arr.length; row += 1) {
@@ -92,7 +93,7 @@ const Game = () => {
       return false;
     };
 
-    const checKTie = () => {
+    const checKDraw = () => {
       if (rowIdx !== 0) return;
 
       const firstLayer = arr[0];
@@ -105,13 +106,13 @@ const Game = () => {
       }
     };
 
-    if (checKTie()) {
+    if (checKDraw()) {
       setIsDraw(true);
       return;
     }
 
     // left
-    if (checkX(colIdx, -1)) {
+    if (checkHorizontal(colIdx, -1)) {
       const victor = attacker === 1 ? "playerOne" : "playerTwo";
       setScores((current) => ({
         ...current,
@@ -121,7 +122,7 @@ const Game = () => {
     }
 
     // right
-    if (checkX(colIdx, 1)) {
+    if (checkHorizontal(colIdx, 1)) {
       const victor = attacker === 1 ? "playerOne" : "playerTwo";
       setScores((current) => ({
         ...current,
@@ -131,7 +132,7 @@ const Game = () => {
     }
 
     // top
-    if (checkY(rowIdx, colIdx)) {
+    if (checkTop(rowIdx, colIdx)) {
       const victor = attacker === 1 ? "playerOne" : "playerTwo";
       setScores((current) => ({
         ...current,
@@ -142,6 +143,7 @@ const Game = () => {
   };
 
   const placeAttack = (colIdx) => {
+    const newCircles = [...circles];
     let rowIdx = 0;
 
     const placingAttack = (arr, colIdx, level) => {
@@ -155,9 +157,8 @@ const Game = () => {
       }
     };
 
-    const newCircles = [...circles];
-    placingAttack(newCircles, colIdx, 1);
     setCircles(newCircles);
+    placingAttack(newCircles, colIdx, 1);
     isWinner(newCircles, rowIdx, colIdx);
     switchAttacker();
     setTimer(30);
@@ -167,7 +168,6 @@ const Game = () => {
     resetBoard();
     setIsVictor(false);
     setIsDraw(false);
-    switchAttacker();
   };
 
   useEffect(() => {
@@ -183,10 +183,11 @@ const Game = () => {
     }, [1000]);
 
     return () => clearInterval(intervalId);
-  }, [timer, attacker]);
+  }, [timer, attacker, isVictor, isDraw]);
 
   useEffect(() => {
     setFirstLoad(() => attacker === 0);
+    setTimer(30);
   }, [attacker]);
 
   return (

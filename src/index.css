@@ -12,6 +12,10 @@ body {
   @apply shadow-[0_4px_0_4px_rgba(0,0,0,1)];
 }
 
+.lg-border-white {
+  @apply border-4 border-black rounded-[38px] border-b-[14px];
+}
+
 .lg-border {
   @apply md:border-4 md:border-black md:rounded-[38px] md:border-b-[14px];
 }
