@@ -10,7 +10,7 @@ import { NavLink } from "react-router-dom";
 // [/] winner
 // [/] scoring
 // [/] play again
-// [x] diagonal checking
+// [/] diagonal checking
 // [x] pause?
 // [x] settings?
 
@@ -58,8 +58,62 @@ const Game = () => {
     setAttacker((current) => (current === 1 ? 2 : 1));
   };
 
+  const generateScore = () => {
+    const victor = attacker === 1 ? "playerOne" : "playerTwo";
+    setScores((current) => ({
+      ...current,
+      [victor]: current[victor] + 1,
+    }));
+  };
+
   const isWinner = (arr, rowIdx, colIdx) => {
     const row = arr[rowIdx];
+
+    // helpers
+    const checkDiagonal = (startRow, startCol, direction) => {
+      let count = 0;
+      let row = startRow;
+      let col = startCol;
+
+      // Check the main diagonal direction
+      while (row >= 0 && row < arr.length && col >= 0 && col < arr[0].length) {
+        if (arr[row][col] === attacker) {
+          count++;
+          if (count === 4) {
+            setIsVictor(true);
+            return true;
+          }
+        } else {
+          break; // If we encounter a non-attacker piece, we stop checking
+        }
+
+        // Move to the next cell in the specified diagonal direction
+        row++;
+        col += direction;
+      }
+
+      // Check the opposite diagonal direction
+      row = startRow - 1;
+      col = startCol - direction;
+
+      while (row >= 0 && row < arr.length && col >= 0 && col < arr[0].length) {
+        if (arr[row][col] === attacker) {
+          count++;
+          if (count === 4) {
+            setIsVictor(true);
+            return true;
+          }
+        } else {
+          break; // If we encounter a non-attacker piece, we stop checking
+        }
+
+        // Move to the next cell in the opposite diagonal direction
+        row--;
+        col -= direction;
+      }
+
+      return false;
+    };
 
     const checkHorizontal = (startCol, direction) => {
       let count = 0;
@@ -108,38 +162,34 @@ const Game = () => {
       }
     };
 
+    // usage
+    if (checkDiagonal(rowIdx, colIdx, 1)) {
+      generateScore();
+      return;
+    }
+
+    if (checkDiagonal(rowIdx, colIdx, -1)) {
+      generateScore();
+      return;
+    }
+
     if (checKDraw()) {
       setIsDraw(true);
       return;
     }
 
-    // left
     if (checkHorizontal(colIdx, -1)) {
-      const victor = attacker === 1 ? "playerOne" : "playerTwo";
-      setScores((current) => ({
-        ...current,
-        [victor]: current[victor] + 1,
-      }));
+      generateScore();
       return;
     }
 
-    // right
     if (checkHorizontal(colIdx, 1)) {
-      const victor = attacker === 1 ? "playerOne" : "playerTwo";
-      setScores((current) => ({
-        ...current,
-        [victor]: current[victor] + 1,
-      }));
+      generateScore();
       return;
     }
 
-    // top
     if (checkTop(rowIdx, colIdx)) {
-      const victor = attacker === 1 ? "playerOne" : "playerTwo";
-      setScores((current) => ({
-        ...current,
-        [victor]: current[victor] + 1,
-      }));
+      generateScore();
       return;
     }
   };
