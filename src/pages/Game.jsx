@@ -4,6 +4,7 @@ import MobileScoreBoard from "../components/MobileScoreBoard";
 import StatusBoard from "../components/StatusBoard";
 import GameBoard from "../components/GameBoard";
 import CustomModal from "../components/CustomModal";
+import { NavLink } from "react-router-dom";
 
 // TODO:
 // [/] winner
@@ -21,6 +22,7 @@ const Game = () => {
   const [attacker, setAttacker] = useState(0);
   const [isVictor, setIsVictor] = useState(false);
   const [confirmRestart, setConfirmRestart] = useState(false);
+  const [isLeavingGame, setIsLeavingGame] = useState(false);
   const [firstLoad, setFirstLoad] = useState(false);
   const [isDraw, setIsDraw] = useState(false);
   const [timer, setTimer] = useState(30);
@@ -192,6 +194,27 @@ const Game = () => {
 
   return (
     <>
+      {isLeavingGame && (
+        <CustomModal>
+          <div className="text-black font-semibold flex flex-col gap-4 items-center">
+            <span>Are you sure you want to leave the game?</span>
+            <div className="flex gap-4">
+              <NavLink
+                to={"/"}
+                className="bg-amber-500 hover:bg-amber-400 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
+              >
+                YES
+              </NavLink>
+              <button
+                onClick={() => setIsLeavingGame(false)}
+                className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
+              >
+                NO
+              </button>
+            </div>
+          </div>
+        </CustomModal>
+      )}
       {confirmRestart && (
         <CustomModal>
           <div className="text-black font-semibold flex flex-col gap-4 items-center">
@@ -216,7 +239,7 @@ const Game = () => {
       {firstLoad && (
         <CustomModal>
           <div className="text-black font-semibold flex flex-col gap-4 items-center">
-            <span>Choose who's first player</span>
+            <span>Choose the first player</span>
             <div className="flex gap-4">
               <button
                 onClick={() => setAttacker(1)}
@@ -237,7 +260,10 @@ const Game = () => {
         </CustomModal>
       )}
       <div className="flex flex-col gap-8 h-full pt-10 pb-28">
-        <Controls openConfirmRestart={() => setConfirmRestart(true)} />
+        <Controls
+          leaveTheGame={() => setIsLeavingGame(true)}
+          openConfirmRestart={() => setConfirmRestart(true)}
+        />
         <MobileScoreBoard scores={scores} />
         <div className="flex items-center justify-around relative">
           <div className="relative p-4 pt-6 sm-border hidden md:flex flex-col items-center font-semibold bg-white text-black">
