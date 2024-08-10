@@ -26,7 +26,7 @@ const Game = () => {
   const [firstLoad, setFirstLoad] = useState(false);
   const [isDraw, setIsDraw] = useState(false);
   const [timer, setTimer] = useState(30);
-  const [circles, setCircles] = useState([
+  const [discs, setDiscs] = useState([
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
@@ -36,7 +36,7 @@ const Game = () => {
   ]);
 
   const resetBoard = () => {
-    setCircles([
+    setDiscs([
       [0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0],
@@ -145,7 +145,7 @@ const Game = () => {
   };
 
   const placeAttack = (colIdx) => {
-    const newCircles = [...circles];
+    const newDiscs = [...discs];
     let rowIdx = 0;
 
     const placingAttack = (arr, colIdx, level) => {
@@ -159,9 +159,9 @@ const Game = () => {
       }
     };
 
-    setCircles(newCircles);
-    placingAttack(newCircles, colIdx, 1);
-    isWinner(newCircles, rowIdx, colIdx);
+    setDiscs(newDiscs);
+    placingAttack(newDiscs, colIdx, 1);
+    isWinner(newDiscs, rowIdx, colIdx);
     switchAttacker();
     setTimer(30);
   };
@@ -276,7 +276,7 @@ const Game = () => {
             <span className="text-[3.5rem] -m-4">{scores.playerOne}</span>
           </div>
           <GameBoard
-            circles={circles}
+            discs={discs}
             isVictor={isVictor}
             placeAttack={placeAttack}
           />

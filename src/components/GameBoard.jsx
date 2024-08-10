@@ -1,9 +1,9 @@
 import React from "react";
 
-const GameBoard = ({ circles, placeAttack, isVictor }) => {
+const GameBoard = ({ discs, placeAttack, isVictor }) => {
   return (
     <div className="w-[90%] md:w-[500px] grid gap-2 md:gap-6 bg-white lg-border-game p-4 pb-10">
-      {circles.map((row, rowIdx) => (
+      {discs.map((row, rowIdx) => (
         <div className="grid gap-6 place-items-center grid-cols-7" key={rowIdx}>
           {row.map((item, colIdx) => (
             <button
