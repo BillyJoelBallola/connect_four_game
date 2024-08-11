@@ -5,14 +5,14 @@ const Controls = ({ openConfirmRestart, leaveTheGame }) => {
     <div className="flex items-center justify-between mx-auto w-[90%] md:w-[500px]">
       <button
         onClick={leaveTheGame}
-        className="bg-violet-900 hover:bg-violet-800 duration-200 py-1 px-4 rounded-full"
+        className="bg-violet-900 hover:bg-violet-800 duration-200 py-1 w-[100px] rounded-full"
       >
         MENU
       </button>
       <img src="/logo.png" alt="logo" className="w-12" />
       <button
         onClick={openConfirmRestart}
-        className="bg-violet-900 hover:bg-violet-800 duration-200 py-1 px-4 rounded-full"
+        className="bg-violet-900 hover:bg-violet-800 duration-200 py-1 w-[100px] rounded-full"
       >
         RESTART
       </button>

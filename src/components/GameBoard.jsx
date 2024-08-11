@@ -3,6 +3,7 @@ import React from "react";
 const GameBoard = ({ discs, placeAttack, isVictor }) => {
   return (
     <div className="w-[90%] md:w-[500px] grid gap-2 md:gap-6 bg-white lg-border-game p-4 pb-10">
+      <div className="absolute bg-green-500 sm-circle-border-top w-10 md:w-12 aspect-square rounded-full"></div>
       {discs.map((row, rowIdx) => (
         <div className="grid gap-6 place-items-center grid-cols-7" key={rowIdx}>
           {row.map((item, colIdx) => (
