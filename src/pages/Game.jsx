@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Controls from "../components/Controls";
 import MobileScoreBoard from "../components/MobileScoreBoard";
 import StatusBoard from "../components/StatusBoard";
 import GameBoard from "../components/GameBoard";
 import CustomModal from "../components/CustomModal";
 import { NavLink } from "react-router-dom";
+import useTimer from "../hooks/useTimer";
+import useGameLogic from "../hooks/useGameLogic";
+import { SettingsContext } from "../context/SettingsContext";
 
 // TODO:
 // [/] winner
@@ -15,333 +18,127 @@ import { NavLink } from "react-router-dom";
 // [x] settings?
 
 const Game = () => {
-  const [scores, setScores] = useState({
-    playerOne: 0,
-    playerTwo: 0,
-  });
-  const [attacker, setAttacker] = useState(0);
-  const [isVictor, setIsVictor] = useState(false);
+  const { settings } = useContext(SettingsContext);
+  const initialScores = { playerOne: 0, playerTwo: 0 };
+  const initialTime = 30;
   const [confirmRestart, setConfirmRestart] = useState(false);
   const [isLeavingGame, setIsLeavingGame] = useState(false);
   const [firstLoad, setFirstLoad] = useState(false);
-  const [isDraw, setIsDraw] = useState(false);
-  const [timer, setTimer] = useState(30);
-  const [discs, setDiscs] = useState([
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-  ]);
 
-  const resetBoard = () => {
-    setDiscs([
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-    ]);
-  };
+  const {
+    discs,
+    scores,
+    attacker,
+    isVictor,
+    isDraw,
+    placeAttack,
+    resetBoard,
+    switchAttacker,
+    setAttacker,
+    setScores,
+    setIsVictor,
+    setIsDraw,
+  } = useGameLogic(settings?.boardSize?.size, initialScores);
+
+  const { time, setTime } = useTimer(initialTime, () => switchAttacker());
 
   const restart = () => {
-    setScores({ playerOne: 0, playerTwo: 0 });
+    setScores(initialScores);
     setFirstLoad(true);
     setConfirmRestart(false);
     setAttacker(0);
     resetBoard();
   };
 
-  const switchAttacker = () => {
-    setAttacker((current) => (current === 1 ? 2 : 1));
-  };
-
-  const generateScore = () => {
-    const victor = attacker === 1 ? "playerOne" : "playerTwo";
-    setScores((current) => ({
-      ...current,
-      [victor]: current[victor] + 1,
-    }));
-  };
-
-  const isWinner = (arr, rowIdx, colIdx) => {
-    const row = arr[rowIdx];
-
-    // helpers
-    const checkDiagonal = (startRow, startCol, direction) => {
-      let count = 0;
-      let row = startRow;
-      let col = startCol;
-
-      // Check the main diagonal direction
-      while (row >= 0 && row < arr.length && col >= 0 && col < arr[0].length) {
-        if (arr[row][col] === attacker) {
-          count++;
-          if (count === 4) {
-            setIsVictor(true);
-            return true;
-          }
-        } else {
-          break; // If we encounter a non-attacker piece, we stop checking
-        }
-
-        // Move to the next cell in the specified diagonal direction
-        row++;
-        col += direction;
-      }
-
-      // Check the opposite diagonal direction
-      row = startRow - 1;
-      col = startCol - direction;
-
-      while (row >= 0 && row < arr.length && col >= 0 && col < arr[0].length) {
-        if (arr[row][col] === attacker) {
-          count++;
-          if (count === 4) {
-            setIsVictor(true);
-            return true;
-          }
-        } else {
-          break; // If we encounter a non-attacker piece, we stop checking
-        }
-
-        // Move to the next cell in the opposite diagonal direction
-        row--;
-        col -= direction;
-      }
-
-      return false;
-    };
-
-    const checkHorizontal = (startCol, direction) => {
-      let count = 0;
-
-      for (let col = startCol; col >= 0 && col < row.length; col += direction) {
-        if (row[col] === attacker) {
-          count++;
-          if (count === 4) {
-            setIsVictor(true);
-            return true;
-          }
-        } else {
-          break;
-        }
-      }
-      return false;
-    };
-
-    const checkTop = (startRow, col) => {
-      let count = 0;
-
-      for (let row = startRow; row >= 0 && row < arr.length; row += 1) {
-        if (arr[row][col] === attacker) {
-          count++;
-          if (count === 4) {
-            setIsVictor(true);
-            return true;
-          }
-        } else {
-          break;
-        }
-      }
-      return false;
-    };
-
-    const checKDraw = () => {
-      if (rowIdx !== 0) return;
-
-      const firstLayer = arr[0];
-      const isThereZero = firstLayer.filter((item) => item === 0);
-
-      if (isThereZero.length === 0) {
-        return true;
-      } else {
-        return false;
-      }
-    };
-
-    // usage
-    if (checkDiagonal(rowIdx, colIdx, 1)) {
-      generateScore();
-      return;
-    }
-
-    if (checkDiagonal(rowIdx, colIdx, -1)) {
-      generateScore();
-      return;
-    }
-
-    if (checKDraw()) {
-      setIsDraw(true);
-      return;
-    }
-
-    if (checkHorizontal(colIdx, -1)) {
-      generateScore();
-      return;
-    }
-
-    if (checkHorizontal(colIdx, 1)) {
-      generateScore();
-      return;
-    }
-
-    if (checkTop(rowIdx, colIdx)) {
-      generateScore();
-      return;
-    }
-  };
-
-  const placeAttack = (colIdx) => {
-    const newDiscs = [...discs];
-    let rowIdx = 0;
-
-    const placingAttack = (arr, colIdx, level) => {
-      if (level > 6) return;
-
-      if (arr[arr.length - level][colIdx] === 0) {
-        arr[arr.length - level][colIdx] = attacker;
-        rowIdx = arr.findIndex((item) => item === arr[arr.length - level]);
-      } else {
-        placingAttack(arr, colIdx, level + 1);
-      }
-    };
-
-    setDiscs(newDiscs);
-    placingAttack(newDiscs, colIdx, 1);
-    isWinner(newDiscs, rowIdx, colIdx);
-    switchAttacker();
-    setTimer(30);
-  };
-
   const playAgain = () => {
     resetBoard();
     setIsVictor(false);
     setIsDraw(false);
+    setTime(initialTime);
   };
 
   useEffect(() => {
-    if (attacker === 0 || isVictor || isDraw) return;
-
-    const intervalId = setInterval(() => {
-      if (timer > 0) {
-        setTimer((current) => current - 1);
-      } else {
-        switchAttacker();
-        setTimer(30);
-      }
-    }, [1000]);
-
-    return () => clearInterval(intervalId);
-  }, [timer, attacker, isVictor, isDraw]);
-
-  useEffect(() => {
     setFirstLoad(() => attacker === 0);
-    setTimer(30);
+    setTime(initialTime);
   }, [attacker]);
 
   return (
     <>
-      {isLeavingGame && (
-        <CustomModal>
-          <div className="text-black text-center font-semibold flex flex-col gap-4 items-center">
-            <span>Are you sure you want to leave the game?</span>
-            <div className="flex gap-4">
-              <NavLink
-                to={"/"}
-                className="bg-amber-500 hover:bg-amber-400 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
-              >
-                YES
-              </NavLink>
-              <button
-                onClick={() => setIsLeavingGame(false)}
-                className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
-              >
-                NO
-              </button>
-            </div>
+      <CustomModal isOpen={isLeavingGame}>
+        <div className="text-black text-center font-semibold flex flex-col gap-4 items-center">
+          <span>Are you sure you want to leave the game?</span>
+          <div className="flex gap-4">
+            <NavLink
+              to={"/"}
+              className="bg-amber-500 hover:bg-amber-400 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
+            >
+              YES
+            </NavLink>
+            <button
+              onClick={() => setIsLeavingGame(false)}
+              className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
+            >
+              NO
+            </button>
           </div>
-        </CustomModal>
-      )}
-      {confirmRestart && (
-        <CustomModal>
-          <div className="text-black text-center font-semibold flex flex-col gap-4 items-center">
-            <span>Are you sure you want to restart the game?</span>
-            <div className="flex gap-4">
-              <button
-                onClick={restart}
-                className="bg-amber-500 hover:bg-amber-400 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
-              >
-                YES
-              </button>
-              <button
-                onClick={() => setConfirmRestart(false)}
-                className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
-              >
-                NO
-              </button>
-            </div>
+        </div>
+      </CustomModal>
+      <CustomModal isOpen={confirmRestart}>
+        <div className="text-black text-center font-semibold flex flex-col gap-4 items-center">
+          <span>Are you sure you want to restart the game?</span>
+          <div className="flex gap-4">
+            <button
+              onClick={restart}
+              className="bg-amber-500 hover:bg-amber-400 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
+            >
+              YES
+            </button>
+            <button
+              onClick={() => setConfirmRestart(false)}
+              className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
+            >
+              NO
+            </button>
           </div>
-        </CustomModal>
-      )}
-      {firstLoad && (
-        <CustomModal>
-          <div className="text-black text-center font-semibold flex flex-col gap-4 items-center">
-            <span>Choose the first player</span>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setAttacker(1)}
-                className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border p-4"
-              >
-                <img src="/yellow-emoji-front.png" alt="yellow emoji" />
-                <span>PLAYER 1</span>
-              </button>
-              <button
-                onClick={() => setAttacker(2)}
-                className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border p-4"
-              >
-                <img src="/pink-emoji-front.png" alt="pink emoji" />
-                <span>PLAYER 2</span>
-              </button>
-            </div>
+        </div>
+      </CustomModal>
+      <CustomModal isOpen={firstLoad}>
+        <div className="text-black text-center font-semibold flex flex-col gap-4 items-center">
+          <span>Choose the first player</span>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setAttacker(1)}
+              className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border p-4"
+            >
+              <img src="/yellow-emoji-front.png" alt="yellow emoji" />
+              <span>PLAYER 1</span>
+            </button>
+            <button
+              onClick={() => setAttacker(2)}
+              className="hover:bg-gray-200 duration-200 flex flex-col gap-1 items-center sm-border p-4"
+            >
+              <img src="/pink-emoji-front.png" alt="pink emoji" />
+              <span>PLAYER 2</span>
+            </button>
           </div>
-        </CustomModal>
-      )}
+        </div>
+      </CustomModal>
       <div className="flex flex-col gap-8 h-full pt-10 pb-28">
         <Controls
           leaveTheGame={() => setIsLeavingGame(true)}
           openConfirmRestart={() => setConfirmRestart(true)}
         />
         <MobileScoreBoard scores={scores} />
-        <div className="flex items-center justify-around relative">
-          <div className="relative p-4 pt-6 sm-border hidden md:flex flex-col items-center font-semibold bg-white text-black">
-            <img
-              src="/yellow-emoji.png"
-              alt="emoji"
-              className="w-10 absolute -top-6"
-            />
-            <span>PLAYER 1</span>
-            <span className="text-[3.5rem] -m-4">{scores.playerOne}</span>
-          </div>
+        <div className="relative">
           <GameBoard
             discs={discs}
             isVictor={isVictor}
             placeAttack={placeAttack}
+            scores={scores}
           />
-          <div className="relative p-4 pt-6 sm-border hidden md:flex flex-col items-center font-semibold bg-white text-black">
-            <img
-              src="/pink-emoji.png"
-              alt="emoji"
-              className="w-10 absolute -top-6"
-            />
-            <span>PLAYER 2</span>
-            <span className="text-[3.5rem] -m-4">{scores.playerTwo}</span>
-          </div>
           <StatusBoard
             attacker={attacker}
-            timer={timer}
+            time={time}
             isVictor={isVictor}
             isDraw={isDraw}
             playAgain={playAgain}

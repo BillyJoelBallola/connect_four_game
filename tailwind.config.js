@@ -9,6 +9,11 @@ export default {
           "100%": { top: "100%" },
         },
       },
+      gridTemplateColumns: {
+        default: "repeat(7, minmax(0, 1fr))",
+        medium: "repeat(6, minmax(0, 1fr))",
+        small: "repeat(5, minmax(0, 1fr))",
+      },
     },
   },
   plugins: [],
