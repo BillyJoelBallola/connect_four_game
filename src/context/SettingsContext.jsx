@@ -1,8 +1,7 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 // TODO:
 // [x] theme
-// [x] resetBoard
 
 const defaultBoard = {
   small: [
@@ -40,6 +39,7 @@ export const SettingsContext = createContext(initialState);
 
 export const SettingsContextProvider = ({ children }) => {
   const [settings, setSettings] = useState(initialState);
+  const [update, setUpdate] = useState(false);
 
   const changeBorderSize = (e) => {
     const selectedSize = e.target.value;
@@ -87,17 +87,23 @@ export const SettingsContextProvider = ({ children }) => {
   };
 
   const resetBoard = () => {
-    const defaultBoardSize = defaultBoard[settings.boardSize.code];
+    const activeBoard = defaultBoard[settings.boardSize.code];
+    let newBoard = [];
 
-    setSettings((current) => {
-      return {
-        ...current,
-        boardSize: {
-          ...current.boardSize,
-          size: defaultBoardSize,
-        },
-      };
-    });
+    for (let subArr of activeBoard) {
+      if (newBoard.length >= activeBoard.length) return;
+      newBoard.push(Array(subArr.length).fill(0));
+    }
+
+    setSettings((current) => ({
+      ...current,
+      boardSize: {
+        ...current.boardSize,
+        size: newBoard,
+      },
+    }));
+
+    setUpdate(true);
   };
 
   return (
@@ -108,6 +114,8 @@ export const SettingsContextProvider = ({ children }) => {
         changeTimeLimit,
         resetSettings,
         resetBoard,
+        update,
+        setUpdate,
       }}
     >
       {children}

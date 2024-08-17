@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { SettingsContext } from "../context/SettingsContext";
 
 const useGameLogic = (initialDiscs, initialScores) => {
   const [discs, setDiscs] = useState(initialDiscs);
@@ -6,6 +7,7 @@ const useGameLogic = (initialDiscs, initialScores) => {
   const [attacker, setAttacker] = useState(0);
   const [isVictor, setIsVictor] = useState(false);
   const [isDraw, setIsDraw] = useState(false);
+  const { settings, update, setUpdate } = useContext(SettingsContext);
 
   const switchAttacker = () => setAttacker((prev) => (prev === 1 ? 2 : 1));
 
@@ -165,6 +167,13 @@ const useGameLogic = (initialDiscs, initialScores) => {
     isWinner(newDiscs, rowIdx, colIdx);
     switchAttacker();
   };
+
+  useEffect(() => {
+    if (update) {
+      setDiscs(settings?.boardSize.size);
+      setUpdate(false);
+    }
+  }, [update]);
 
   return {
     discs,
