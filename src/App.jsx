@@ -3,6 +3,7 @@ import Layout from "./pages/Layout";
 import Menu from "./pages/Menu";
 import Game from "./pages/Game";
 import Rules from "./pages/Rules";
+import Settings from "./pages/Settings";
 
 function App() {
   const router = createBrowserRouter([
@@ -21,6 +22,10 @@ function App() {
         {
           path: "/rules",
           element: <Rules />,
+        },
+        {
+          path: "/settings",
+          element: <Settings />,
         },
       ],
     },

@@ -18,7 +18,8 @@ const GameBoard = ({ discs, placeAttack, isVictor, scores }) => {
       <div className="md:w-auto grid gap-2 place-items-center md:gap-6 bg-white lg-border-game p-4 pb-10">
         {discs.map((row, rowIdx) => (
           <div
-            className={`grid gap-6 place-items-center grid-cols-${settings?.boardSize?.code}`}
+            data-size={`${settings?.boardSize?.code}`}
+            className="gameBoard grid gap-6 place-items-center"
             key={rowIdx}
           >
             {row.map((item, colIdx) => (

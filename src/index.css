@@ -31,3 +31,15 @@ body {
 .sm-circle-border-top {
   @apply border-4 border-black rounded-full border-t-[8px];
 }
+
+.gameBoard[data-size="large"] {
+  @apply grid-cols-default;
+}
+
+.gameBoard[data-size="medium"] {
+  @apply grid-cols-medium;
+}
+
+.gameBoard[data-size="small"] {
+  @apply grid-cols-small;
+}

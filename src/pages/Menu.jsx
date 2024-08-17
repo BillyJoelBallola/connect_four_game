@@ -15,6 +15,12 @@ const Menu = () => {
             <img src="/btn-emoji.png" alt="icon" className="w-16" />
           </NavLink>
           <NavLink
+            to="/settings"
+            className="sm-border flex gap-4 items-center justify-between text-lg md:text-xl font-semibold h-16 px-6 bg-rose-400 hover:bg-rose-300 duration-200 border-black"
+          >
+            SETTINGS
+          </NavLink>
+          <NavLink
             to="/rules"
             className="sm-border flex items-center text-lg md:text-xl font-semibold h-16 px-6 bg-white hover:bg-gray-200 duration-200 border-black"
           >

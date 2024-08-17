@@ -9,18 +9,9 @@ import useTimer from "../hooks/useTimer";
 import useGameLogic from "../hooks/useGameLogic";
 import { SettingsContext } from "../context/SettingsContext";
 
-// TODO:
-// [/] winner
-// [/] scoring
-// [/] play again
-// [/] diagonal checking
-// [x] pause?
-// [x] settings?
-
 const Game = () => {
-  const { settings } = useContext(SettingsContext);
+  const { settings, resetBoard } = useContext(SettingsContext);
   const initialScores = { playerOne: 0, playerTwo: 0 };
-  const initialTime = 30;
   const [confirmRestart, setConfirmRestart] = useState(false);
   const [isLeavingGame, setIsLeavingGame] = useState(false);
   const [firstLoad, setFirstLoad] = useState(false);
@@ -32,7 +23,6 @@ const Game = () => {
     isVictor,
     isDraw,
     placeAttack,
-    resetBoard,
     switchAttacker,
     setAttacker,
     setScores,
@@ -40,7 +30,9 @@ const Game = () => {
     setIsDraw,
   } = useGameLogic(settings?.boardSize?.size, initialScores);
 
-  const { time, setTime } = useTimer(initialTime, () => switchAttacker());
+  const { time, setTime } = useTimer(settings?.timeLimit, () =>
+    switchAttacker()
+  );
 
   const restart = () => {
     setScores(initialScores);
@@ -54,12 +46,12 @@ const Game = () => {
     resetBoard();
     setIsVictor(false);
     setIsDraw(false);
-    setTime(initialTime);
+    setTime(settings?.timeLimit);
   };
 
   useEffect(() => {
     setFirstLoad(() => attacker === 0);
-    setTime(initialTime);
+    setTime(settings?.timeLimit);
   }, [attacker]);
 
   return (

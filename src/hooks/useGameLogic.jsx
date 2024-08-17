@@ -17,8 +17,6 @@ const useGameLogic = (initialDiscs, initialScores) => {
     }));
   };
 
-  const resetBoard = () => setDiscs(initialDiscs);
-
   const isWinner = (arr, rowIdx, colIdx) => {
     const row = arr[rowIdx];
 
@@ -175,7 +173,6 @@ const useGameLogic = (initialDiscs, initialScores) => {
     isVictor,
     isDraw,
     placeAttack,
-    resetBoard,
     generateScore,
     switchAttacker,
     setAttacker,
