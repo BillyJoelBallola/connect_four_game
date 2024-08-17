@@ -62,6 +62,7 @@ const Game = () => {
           <div className="flex gap-4">
             <NavLink
               to={"/"}
+              onClick={restart}
               className="bg-amber-500 hover:bg-amber-400 duration-200 flex flex-col gap-1 items-center sm-border px-4 py-2"
             >
               YES
